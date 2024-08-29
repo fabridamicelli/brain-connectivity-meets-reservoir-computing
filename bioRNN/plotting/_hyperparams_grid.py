@@ -30,18 +30,15 @@ def hyperparams_grid(
         palette=palette,
         legend=legend,
         ci=ci,
-        **catplot_kws,
+        **catplot_kws
     )
     plt.setp(g._legend.get_title(), fontsize=30)
     for ax in g.axes.flat:
-        ax.spines["left"].set_linewidth(4)
-        ax.spines["bottom"].set_linewidth(4)
+        ax.spines['left'].set_linewidth(4)
+        ax.spines['bottom'].set_linewidth(4)
         ax.grid(linestyle="--", alpha=0.8, axis="y", linewidth=2.5)
         ax.yaxis.set_tick_params(width=3.5, size=10)
         ax.xaxis.set_tick_params(bottom=False)
         ax.set_xticklabels(ax.get_xticklabels(), rotation=35)
-    sns.despine(
-        trim=True,
-        bottom=True,
-    )
+    sns.despine(trim=True, bottom=True,)
     return g

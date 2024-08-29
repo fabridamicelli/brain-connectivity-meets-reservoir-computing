@@ -114,7 +114,7 @@ if __name__ == "__main__":
             connectomes=CONNECTOMES,
             n_jobs=5,
             n_samples=10,  # per gridpoint
-            n_trials_discard=20,
+            n_trials_discard= 20,
             pattern_length=patlen,
             task_params={
                 "task_name": "seq_mem",
@@ -127,7 +127,7 @@ if __name__ == "__main__":
             param_grid={
                 "spectral_radius": np.arange(80, 101, 5) * 0.01,
                 "input_scaling": 1 / 10 ** np.arange(8, -1, -1),
-                "leak_rate": [0.8, 0.9, 1],
+                "leak_rate": [0.8, .9, 1],
             },
         )
 

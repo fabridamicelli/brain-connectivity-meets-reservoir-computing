@@ -24,15 +24,13 @@ results = {
 esn_params = dict(
     n_inputs=2,
     n_outputs=1,
-    spectral_radius=0.99,
+    spectral_radius=.99,
     n_transient=220,
     input_scaling=0.0001,
 )
 
 for connectome in AVAILABLE_CONNECTOMES:
-    W_bio, W_bio_shuffled, W_rnd, W_rnd_k, W_full = make_bioRRN(
-        connectome_name=connectome, k=10
-    )
+    W_bio, W_bio_shuffled, W_rnd, W_rnd_k, W_full = make_bioRRN(connectome_name=connectome, k=10)
     Ws = (W_bio, W_bio_shuffled, W_rnd, W_rnd_k, W_full)
     W_names = ("W_bio", "W_bio_shuffled", "W_rnd", "W_rnd_k", "W_full")
 
@@ -43,9 +41,7 @@ for connectome in AVAILABLE_CONNECTOMES:
         for pattern_length in pattern_lengths:
             for _ in range(n_samples):
                 score = SequenceMemory(
-                    n_trials=200,
-                    pattern_length=pattern_length,
-                    esn_params=esn_params,
+                    n_trials=200, pattern_length=pattern_length, esn_params=esn_params,
                 ).score()
 
                 results["pattern_length"].append(pattern_length)
@@ -59,26 +55,20 @@ results = pd.DataFrame(results)
 results.to_csv(dir_res / "pattern_length" / "pattern_length.csv", index=False)
 
 lines = sns.relplot(
-    x="pattern_length",
-    y="score",
-    data=results,
-    col="connectome",
-    hue="W",
+    x="pattern_length", y="score", data=results,
+    col="connectome", hue="W",
     kind="line",
     col_wrap=3,
 )
 
 boxes = sns.catplot(
-    x="pattern_length",
-    y="score",
-    data=results,
-    col="connectome",
-    hue="W",
+    x="pattern_length", y="score", data=results,
+    col="connectome", hue="W",
     kind="box",
     col_wrap=3,
 )
 
 lines.set_xticklabels(rotation=45)
 boxes.set_xticklabels(rotation=45)
-lines.savefig(dir_res / "pattern_length" / "figs" / "lines")
-boxes.savefig(dir_res / "pattern_length" / "figs" / "boxes")
+lines.savefig(dir_res / "pattern_length"/ "figs" / "lines")
+boxes.savefig(dir_res / "pattern_length"/ "figs" / "boxes")

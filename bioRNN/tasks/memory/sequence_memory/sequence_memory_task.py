@@ -2,7 +2,12 @@ import numpy as np
 from sklearn.metrics import r2_score
 
 
-def generate_input_output_patterns(pattern_length=5, low=0.0, high=1.0, n_trials=100):
+def generate_input_output_patterns(
+    pattern_length=5, 
+    low=0.0, 
+    high=1.0, 
+    n_trials=100
+):
     """
     Generate pattern to memorize with length N and from a uniform distribution
     between low and high values.
@@ -14,6 +19,7 @@ def generate_input_output_patterns(pattern_length=5, low=0.0, high=1.0, n_trials
     all_output_trials = None
 
     for tr in range(0, n_trials):
+
         # Create here standard blocks of the trials, namely the cue and "null input"
         # The cue is a 1 on a channel that is not used for the patterns,
         # so concatanate a vector with 0s when we have a trial with input
@@ -69,6 +75,7 @@ def generate_input_output_patterns(pattern_length=5, low=0.0, high=1.0, n_trials
 
 
 def evaluate_performance(predicted, actual, discard=0, low=0.0, high=1.0):
+
     actual = actual[discard:]
     predicted = predicted[discard:]
 
@@ -79,7 +86,7 @@ def evaluate_performance(predicted, actual, discard=0, low=0.0, high=1.0):
     predicted = predicted[indexes_not_zeros]
     actual = actual[indexes_not_zeros]
     err = mean_squared_error(actual, predicted)
-    #     print("r2:", r2_score(actual, predicted))
+#     print("r2:", r2_score(actual, predicted))
     # Generate a sequence from the same distribution used for the trials
     # This will function as a "null" baseline
     predicted_rand = np.random.uniform(low, high, len(predicted))
@@ -88,6 +95,7 @@ def evaluate_performance(predicted, actual, discard=0, low=0.0, high=1.0):
 
 
 def score_task(predicted, actual, discard=0):
+
     actual = actual[discard:]
     predicted = predicted[discard:]
 
@@ -99,10 +107,14 @@ def score_task(predicted, actual, discard=0):
     actual = actual[indexes_not_zeros]
     return r2_score(actual, predicted)
 
-
 class SequenceMemory:
     def __init__(
-        self, pattern_length=5, low=0.0, high=1.0, n_trials=5000, esn_params=None
+        self,
+        pattern_length=5,
+        low=0.0,
+        high=1.0,
+        n_trials=5000,
+        esn_params=None
     ):
         self.pattern_length = pattern_length
         self.low = low
@@ -118,7 +130,7 @@ class SequenceMemory:
             pattern_length=self.pattern_length,
             low=self.low,
             high=self.high,
-            n_trials=self.n_trials,
+            n_trials=self.n_trials
         )
         return X, y
 

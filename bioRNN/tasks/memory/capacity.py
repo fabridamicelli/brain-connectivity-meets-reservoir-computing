@@ -34,11 +34,7 @@ def make_X_y(
     y = _make_lagged_y(X, lags=lags)
     return X[cut:], y[cut:]
 
-
-def _make_lagged_y(
-    inputs: np.ndarray,
-    lags: np.ndarray,
-) -> np.ndarray:
+def _make_lagged_y(inputs: np.ndarray, lags: np.ndarray,) -> np.ndarray:
     """
     Generate delayed versions of inputs sequence.
     One sequence is generated for each lag value.
@@ -93,11 +89,9 @@ def forgetting(y_true: np.ndarray, y_pred: np.ndarray) -> Tuple[List, float]:
     give delay.
     """
     assert y_pred.shape == y_true.shape, "y_pred and y_true must have same shape"
-    assert (
-        y_pred.shape[0] > 1
-    ), "Error while computing forgetting: y_pred has less than 1 sample. Increase the number of samples (steps)"
+    assert y_pred.shape[0] > 1, "Error while computing forgetting: y_pred has less than 1 sample. Increase the number of samples (steps)"
     r2s = []
     for true, pred in zip(y_true.T, y_pred.T):
         r2 = np.corrcoef(true, pred)[0, 1]
-        r2s.append(0 if r2 is None else r2**2)
+        r2s.append(0 if r2 is None else r2 ** 2)
     return r2s, np.sum(r2s)

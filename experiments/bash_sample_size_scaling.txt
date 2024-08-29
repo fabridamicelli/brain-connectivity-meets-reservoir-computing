@@ -1,0 +1,7 @@
+for density in {1..100}
+do
+echo "computing density: $density"
+python sample_memory-capacity.py --esn_params best --concatenate_results no --neuron_density density --n_jobs -2
+done
+
+

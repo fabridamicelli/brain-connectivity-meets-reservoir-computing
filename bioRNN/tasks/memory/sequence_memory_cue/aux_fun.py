@@ -8,6 +8,7 @@ import numpy as np
 
 
 def group_shuffle(X, Y, indexes):
+
     unique_indexes = np.unique(indexes)
     unique_indexes = unique_indexes[np.random.permutation(len(unique_indexes))]
 
@@ -48,6 +49,7 @@ def combo_params(params):
 
 
 def rand_net(A):
+
     nodes = A.shape[0]
     values = A[torch.where(A)]
     edges = len(values)
@@ -61,6 +63,7 @@ def rand_net(A):
 
 
 def map_weights_to_template(w_template=None, w_to_map=None):
+
     X = torch.zeros(w_template.shape).double()
 
     idx = torch.where(w_template != 0)

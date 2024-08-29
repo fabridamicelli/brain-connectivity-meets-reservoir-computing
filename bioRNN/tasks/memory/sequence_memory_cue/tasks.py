@@ -10,13 +10,13 @@ import aux_fun
 
 # Task functions
 
-
 # Generate pattern to memorize with length N and from a uniform distribution
 # between low and high values.
 # Trials have a memorize period (the generated numbers=pattern_length)
 # and a recall period, that is, 0s=pattern_length. The trials are padded with
 # zeros and ones with 1 denoting "recall cue". Thus, trials are 2D arrays.
 def generate_sequence_patterns(pattern_length=3, low=0.0, high=1.0, nr_of_trials=100):
+
     all_input_trials = None
     all_output_trials = None
 
@@ -25,6 +25,7 @@ def generate_sequence_patterns(pattern_length=3, low=0.0, high=1.0, nr_of_trials
     # import numpy as np
 
     for tr in range(0, nr_of_trials):
+
         # Create here standard blocks of the trials, namely the cue and "null input"
         # The cue is a 1 on a channel that is not used for the patterns,
         # so concatanate a vector with 0s when we have a trial with input
@@ -67,10 +68,12 @@ def generate_sequence_patterns(pattern_length=3, low=0.0, high=1.0, nr_of_trials
         # Concatanate the generated input/output trials to the the overall
         # trials array
         if all_input_trials is None:
+
             all_input_trials = input_trial
             all_output_trials = output_trial
 
         else:
+
             all_input_trials = np.hstack((all_input_trials, input_trial))
             all_output_trials = np.hstack((all_output_trials, output_trial))
 
@@ -79,9 +82,11 @@ def generate_sequence_patterns(pattern_length=3, low=0.0, high=1.0, nr_of_trials
         current_index[:] = tr
 
         if all_trials_index is None:
+
             all_trials_index = current_index
 
         else:
+
             all_trials_index = np.hstack((all_trials_index, current_index))
 
     all_input_trials = all_input_trials.T
@@ -100,6 +105,7 @@ def generate_pic_wm_trials(
     trial_matching=False,
     rescale=True,
 ):
+
     if ((trial_length - n_back) <= 0) and (n_back is not None):
         raise ValueError("N-Back value must be less than the trial length")
 
@@ -111,6 +117,7 @@ def generate_pic_wm_trials(
     img_pixels = images.shape[1] * images.shape[2]
 
     for tr in range(0, nr_of_trials):
+
         # Create here standard blocks of the trials, namely the cue and "null input"
         # The cue is a 1 on a channel that is not used for the patterns,
         # so concatanate a vector with 0s when we have a trial with input
@@ -195,10 +202,12 @@ def generate_pic_wm_trials(
         # Concatanate the generated input/output trials to the overall
         # trials array
         if all_input_trials is None:
+
             all_input_trials = input_trial
             all_output_trials = output_trial
 
         else:
+
             all_input_trials = np.hstack((all_input_trials, input_trial))
             all_output_trials = np.hstack((all_output_trials, output_trial))
 
@@ -207,9 +216,11 @@ def generate_pic_wm_trials(
         current_index[:] = tr
 
         if all_trials_index is None:
+
             all_trials_index = current_index
 
         else:
+
             all_trials_index = np.hstack((all_trials_index, current_index))
 
     all_input_trials = all_input_trials.T
@@ -223,6 +234,7 @@ def generate_pic_wm_trials(
 def generate_bin_wm_trials(
     trial_length=5, nr_of_trials=100, n_back=None, trial_matching=False
 ):
+
     if ((trial_length - n_back) <= 0) and (n_back is not None):
         raise ValueError("N-Back value must be less than the trial length")
 
@@ -232,6 +244,7 @@ def generate_bin_wm_trials(
     all_trials_index = None
 
     for tr in range(0, nr_of_trials):
+
         # Create here standard blocks of the trials, namely the cue and "null input"
         # The cue is a 1 on a channel that is not used for the patterns,
         # so concatanate a vector with 0s when we have a trial with input
@@ -316,10 +329,12 @@ def generate_bin_wm_trials(
         # Concatanate the generated input/output trials to the the overall
         # trials array
         if all_input_trials is None:
+
             all_input_trials = input_trial
             all_output_trials = output_trial
 
         else:
+
             all_input_trials = np.hstack((all_input_trials, input_trial))
             all_output_trials = np.hstack((all_output_trials, output_trial))
 
@@ -328,9 +343,11 @@ def generate_bin_wm_trials(
         current_index[:] = tr
 
         if all_trials_index is None:
+
             all_trials_index = current_index
 
         else:
+
             all_trials_index = np.hstack((all_trials_index, current_index))
 
     all_input_trials = all_input_trials.T
@@ -343,6 +360,7 @@ def generate_bin_wm_trials(
 
 def wrapper_trials(func):
     def internal(**kwargs):
+
         print("Generating trials with params:")
         for key in kwargs:
             if key != "images":
@@ -381,6 +399,7 @@ def create_train_test_trials(X=None, Y=None, indexes=None, train_size=0.2):
     gss = GroupShuffleSplit(n_splits=1, train_size=train_size)
 
     for train_idx, validate_idx in gss.split(X, Y, indexes):
+
         X_train = X[train_idx]
         Y_train = Y[train_idx]
 
@@ -402,6 +421,7 @@ def create_train_test_trials(X=None, Y=None, indexes=None, train_size=0.2):
 
 # Trim zeros in-between experimental periods
 def trim_zeros_from_trials(actual=None, predicted=None):
+
     ind = torch.where(actual != 0)[0]  # use the actual trials for tracking non 0s
     actual_trimmed = actual[ind]
     predicted_trimmed = predicted[ind]
@@ -410,6 +430,7 @@ def trim_zeros_from_trials(actual=None, predicted=None):
 
 
 def create_trials(trial_params):
+
     if trial_params["task_name"] == "seq_mem":
         pattern_length = trial_params["pattern_length"]
         low = trial_params["low"]

@@ -1,15 +1,27 @@
 import numpy as np
 
 
-def make_X_y(pattern_length=5, low=0.0, high=1.0, n_trials=5000):
+def make_X_y(
+    pattern_length=5,
+    low=0.0,
+    high=1.0,
+    n_trials=5000
+):
     """Generate input-output patterns"""
     X, y = generate_input_output_patterns(
-        pattern_length=pattern_length, low=low, high=high, n_trials=n_trials
+        pattern_length=pattern_length,
+        low=low,
+        high=high,
+        n_trials=n_trials
     )
     return X, y
 
-
-def generate_input_output_patterns(pattern_length=5, low=0.0, high=1.0, n_trials=100):
+def generate_input_output_patterns(
+    pattern_length=5,
+    low=0.0,
+    high=1.0,
+    n_trials=100
+):
     """
     Generate pattern to memorize with length N and from a uniform distribution
     between low and high values.
@@ -21,6 +33,7 @@ def generate_input_output_patterns(pattern_length=5, low=0.0, high=1.0, n_trials
     all_output_trials = None
 
     for tr in range(0, n_trials):
+
         # Create here standard blocks of the trials, namely the cue and "null input"
         # The cue is a 1 on a channel that is not used for the patterns,
         # so concatanate a vector with 0s when we have a trial with input

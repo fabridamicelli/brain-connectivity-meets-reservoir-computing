@@ -6,7 +6,6 @@ import numpy as np
 from echoes import ESNRegressor
 import tasks
 
-
 @gin.configurable
 def evaluate_task(
     gridpoint: Mapping,
@@ -24,7 +23,7 @@ def evaluate_task(
     return (
         ESNRegressor(
             n_transient=int(task_params["pattern_length"] * n_trials_exclude),
-            **gridpoint,
+            **gridpoint
         )
         .fit(X_train, y_train)
         .score(X_test, y_test)
