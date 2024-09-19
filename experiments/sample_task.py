@@ -6,6 +6,7 @@ Only connectomes_path, connectome, neuron_density and rand_partition
 are treated here as variables. The rest of parameters used to create
 the reservoirs are just the defaults (see function make_bioRRNs for details).
 """
+
 import inspect
 from pathlib import Path
 from typing import Callable, Union, Mapping, List, Dict, Tuple
@@ -27,7 +28,8 @@ from bioRNN.utils import (
 )
 
 
-def sample_grid(*,
+def sample_grid(
+    *,
     n_samples: int,
     rand_partition: bool,
     neuron_density: int,
@@ -38,8 +40,8 @@ def sample_grid(*,
     directory_results: Path,
     filename: str,
     connectomes_path: Path,
-    connectome_names: Tuple[str] = ("macaque", "marmoset", "human"),
-    estimator_class: Union[ESNRegressor, None] = ESNRegressor,  # TODO ESNImageClassifier
+    connectome_names: Tuple[str, str, str] = ("macaque", "marmoset", "human"),
+    estimator_class=ESNRegressor,
     n_jobs: int = -3,
 ) -> None:
     assert_args_not_none(locals().items())
@@ -62,18 +64,19 @@ def sample_grid(*,
         results.to_csv(directory_results / filename, index=False)
 
 
-def sample_grid_point(*,
+def sample_grid_point(
+    *,
     X: np.ndarray,
     y: np.ndarray,
     n_samples: int,
     param_grid: Mapping,
     scorer: Dict,
-    test_size: Union[int, float] = 0.2,
+    test_size: float = 0.2,
     connectomes_path: Path,
     connectome_name: str,
     rand_partition: bool,
     neuron_density: int,
-    estimator_class: Union[ESNRegressor, None] = ESNRegressor,  # TODO: ESNImageClassifier
+    estimator_class=ESNRegressor,
     n_jobs: int = -3,
 ) -> pd.DataFrame:
     """Return DataFrame with results of evaluating the grid point on n_samples times"""

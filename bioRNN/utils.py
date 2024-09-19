@@ -13,7 +13,6 @@ from sklearn.metrics import make_scorer, r2_score
 from tqdm import tqdm
 
 from bio2art import importnet
-from utils import clean_df_param_names
 from bioRNN.tasks.memory.capacity import forgetting
 
 
@@ -98,10 +97,10 @@ def make_bioRRNs(
     neuron_density: Union[int, np.ndarray] = 4,
     target_sparsity: float = 0.8,
     intrinsic_conn: bool = True,
-    target_sparsity_intrinsic: float = 1.,
-    intrinsic_wei: float = .8,
+    target_sparsity_intrinsic: float = 1.0,
+    intrinsic_wei: float = 0.8,
     rand_partition: bool,
-    keep_diag: bool = False
+    keep_diag: bool = False,
 ) -> Dict[str, np.ndarray]:
     """
     Wrapper function for bio-reservoir generation.
@@ -145,7 +144,7 @@ def make_bioRRNs(
         target_sparsity_intrinsic=target_sparsity_intrinsic,
         intrinsic_wei=intrinsic_wei,
         rand_partition=rand_partition,
-        keep_diag=keep_diag
+        keep_diag=keep_diag,
     )
     # Random reservoir initialization
     W = np.random.uniform(low=-1, high=1, size=bio_rnn.shape)
@@ -201,7 +200,7 @@ def match_k(W: np.ndarray, k: int) -> np.ndarray:
     return W_k
 
 
-def cv_generator(X, test_size=.2):
+def cv_generator(X, test_size=0.2):
     """
     Cross validation splits for gridsearch.
     Since it is a time series, shuffle=False to generate test from last steps.
@@ -224,13 +223,16 @@ def remove_transient(n_transient=100):
            return compute_something(y_true, y_pred, **kwargs)
     >> custom_score(y_true, y_pred)
     """
+
     def remover(score_func):
         def score(y_true, y_pred, sample_weight=None, **kwargs):
             y_true, y_pred = y_true[n_transient:], y_pred[n_transient:]
             if sample_weight is not None:
                 sample_weight = sample_weight[n_transient:]
             return score_func(y_true, y_pred, sample_weight=sample_weight, **kwargs)
+
         return score
+
     return remover
 
 
@@ -239,10 +241,12 @@ def remove_fixation(score_func):
     Decorate score_func removing where y_true == 0 (fixation time).
     Tested for r2_score and mean_squared_error.
     """
+
     def score(y_true, y_pred, sample_weight=None, **kwargs):
         mask = y_true != 0
         y_true, y_pred = y_true[mask], y_pred[mask]
         return score_func(y_true, y_pred, sample_weight=None, **kwargs)
+
     return score
 
 
@@ -273,23 +277,29 @@ def make_scoring(
     if delete_fixation:
         scoring = {
             name: make_scorer(
-                remove_fixation(
-                    remove_transient(n_transient)(func)
-                ),
-                greater_is_better=better
+                remove_fixation(remove_transient(n_transient)(func)),
+                greater_is_better=better,
             )
             for (name, func), better in zip(scorers.items(), greater_is_better)
         }
         return scoring
 
     scoring = {
-        name: make_scorer(
-            remove_transient(n_transient)(func),
-            greater_is_better=better
-        )
+        name: make_scorer(remove_transient(n_transient)(func), greater_is_better=better)
         for (name, func), better in zip(scorers.items(), greater_is_better)
     }
     return scoring
+
+
+def clean_df_param_names(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Return copy of df with transformed columns names like so:
+    'param_something' -> 'something'
+    Rest of columns are left as they are.
+    """
+    df = df.copy()
+    df.columns = [col[6:] if col.startswith("param_") else col for col in df.columns]
+    return df
 
 
 def clean_col_names(df: pd.DataFrame):
@@ -297,19 +307,17 @@ def clean_col_names(df: pd.DataFrame):
     df.drop(
         inplace=True,
         columns=[
-            c for c in df.columns
+            c
+            for c in df.columns
             if any((
                 c.startswith(("split0", "std_", "rank_")),
                 c.endswith("_time"),
-                c == "params"
+                c == "params",
             ))
-        ]
+        ],
     )
     df.rename(
-        {"mean_test_r2": "r2",
-         "mean_test_mse": "mse"},
-        axis="columns",
-        inplace=True
+        {"mean_test_r2": "r2", "mean_test_mse": "mse"}, axis="columns", inplace=True
     )
     return df
 
@@ -326,18 +334,14 @@ def get_best_params(
 
     params: list-like of parameters (assumed to be column names in df).
     """
-    df = (
-        df
-        .groupby(by=params)
-        .mean()
-        .sort_values(by=by, ascending=False)
-        .reset_index()
-    )
+    df = df.groupby(by=params).mean().sort_values(by=by, ascending=False).reset_index()
     best_params = dict(zip(params, df.iloc[0][params]))
     return best_params
 
 
-def make_neuron_density(connectome: str, neuron_density: Union[int, np.ndarray]) -> np.ndarray:
+def make_neuron_density(
+    connectome: str, neuron_density: Union[int, np.ndarray]
+) -> np.ndarray:
     """
     Return vector with same connectome length, filled with neuron_density.
     If neuron_density is a vector, it does nothing to it – just returns it.
@@ -351,7 +355,7 @@ def make_neuron_density(connectome: str, neuron_density: Union[int, np.ndarray])
         "macaque": 29,
         "marmoset": 55,
         "mouse-gamanut": 19,
-        "mouse-oh": 56
+        "mouse-oh": 56,
     }
 
     return np.full(n_neurons[connectome], neuron_density, dtype=np.int)
@@ -364,9 +368,9 @@ def make_bioRRNs_old(
     neuron_density: Union[int, np.ndarray] = 4,
     target_sparsity: float = 0.8,
     intrinsic_conn: bool = True,
-    target_sparsity_intrinsic: float = 1.,
+    target_sparsity_intrinsic: float = 1.0,
     rand_partition: bool = True,
-    keep_diag: bool = True
+    keep_diag: bool = True,
 ) -> Dict:
     """
     DEPRECATED
@@ -410,7 +414,7 @@ def make_bioRRNs_old(
         intrinsic_conn=intrinsic_conn,
         target_sparsity_intrinsic=target_sparsity_intrinsic,
         rand_partition=rand_partition,
-        keep_diag=keep_diag
+        keep_diag=keep_diag,
     )
     topology = bio_rnn != 0
 
@@ -474,9 +478,13 @@ def concat_results_randpart_pattlen(
             dfs.append(df)
 
     else:
-        for rand_partition, pattern_length in tqdm(product(rand_partitions, pattern_lengths),
-                                                   total=len(rand_partitions)*len(pattern_lengths)):
-            filename = path / (filename_base + f"rand-part-{rand_partition}_patt-len-{pattern_length}")
+        for rand_partition, pattern_length in tqdm(
+            product(rand_partitions, pattern_lengths),
+            total=len(rand_partitions) * len(pattern_lengths),
+        ):
+            filename = path / (
+                filename_base + f"rand-part-{rand_partition}_patt-len-{pattern_length}"
+            )
             df = pd.read_csv(filename)
             df.insert(len(df.columns) - 2, "pattern_length", [pattern_length] * len(df))
             dfs.append(df)
@@ -503,7 +511,9 @@ def make_sklearn_scorer(
         raise ValueError("Either remove_transient or remove_fixation must be True")
     """Return a sklearn scorer (ready to pass to scoring in GridSearch)"""
     if delete_fixation and delete_transient:
-        return make_scorer(remove_fixation(remove_transient(n_transient=n_transient)(score_func)))
+        return make_scorer(
+            remove_fixation(remove_transient(n_transient=n_transient)(score_func))
+        )
     return make_scorer(remove_transient(n_transient=n_transient)(score_func))
 
 
@@ -516,11 +526,14 @@ def make_memory_capacity_scorer(n_transient=None) -> Dict:
     def memory_capacity(y_true, y_pred, **kwargs):
         _, mc = forgetting(y_true, y_pred)
         return mc
+
     scorer = make_scorer(remove_transient(n_transient=n_transient)(memory_capacity))
     return {"memory_capacity": scorer}
 
 
-def create_fill_cols(df: pd. DataFrame, loc_col_val: List[Tuple[int, str, float]]) -> pd.DataFrame:
+def create_fill_cols(
+    df: pd.DataFrame, loc_col_val: List[Tuple[int, str, float]]
+) -> pd.DataFrame:
     """
     Return copy of df with new columns.
     loc_col_val specifies (location, column, value) to insert using.df.insert.
@@ -536,8 +549,7 @@ def print_progress(**params: float) -> None:
     width, _ = get_terminal_size()
     print("".center(width, "="))
     print(dt.now())
-    print(", ".join([f"{key}={val}" for key, val in params.items()]).center(width, ".")
-    )
+    print(", ".join([f"{key}={val}" for key, val in params.items()]).center(width, "."))
     print("".center(width, "="))
 
 
@@ -555,10 +567,13 @@ def capitalize_columns(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
         df[col] = df[col].str.capitalize()
     return df
 
+
 def refactor_names(
     *,
     df: pd.DataFrame,
-    capitalize_cols: List[str] = ["connectome",],
+    capitalize_cols: List[str] = [
+        "connectome",
+    ],
     to_replace: Dict[str, str] = {
         "bio_rank": "Bio (rank)",
         "bio_norank": "Bio (no-rank)",

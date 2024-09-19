@@ -1,0 +1,7 @@
+-e .
+jupyterlab
+numpy
+scikit-learn
+echoes
+tqdm
+git+https://github.com/AlGoulas/bio2art
